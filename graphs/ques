@@ -1,0 +1,1693 @@
+import java.util.*;
+class Main {
+    static class Edge{
+        int src;
+        int des;
+        int weg;
+        
+        Edge(int s,int d,int w){
+            this.src=s;
+            this.des=d;
+            this.weg=w;
+        }
+    }
+    public static void main(String[] args) {
+        int v=5;
+        @SuppressWarnings("unchecked")
+        ArrayList<Edge>[] graph=new ArrayList[v];
+        for(int i=0;i<v;i++){
+            graph[i]=new ArrayList<>();
+        }
+        graph[0].add(new Edge(0,1,5));
+        graph[1].add(new Edge(1,0,5));
+        graph[1].add(new Edge(1,2,1));
+        graph[1].add(new Edge(1,3,3));
+        graph[2].add(new Edge(2,1,1));
+        graph[2].add(new Edge(2,3,1));
+        graph[2].add(new Edge(2,4,4));
+        graph[3].add(new Edge(3,1,3));
+        graph[3].add(new Edge(3,2,1));
+        graph[4].add(new Edge(4,2,2));
+        
+         for(int i=0;i<graph[1].size();i++){
+            Edge e=graph[1].get(i);
+            System.out.println(e.des);
+        }
+    }
+}
+
+//bfs
+//dfs
+//bfs-modified
+//dfs-modified
+
+//cycle detection
+
+import java.util.*;
+class Main {
+    static class Edge{
+        int sou;
+        int dest;
+        
+        Edge(int s,int d){
+            this.sou=s;
+            this.dest=d;
+        }
+    }
+        
+        public static boolean Cycledetection(ArrayList<Edge>graph[]){
+            boolean vis[]=new boolean[graph.length];
+            for(int i=0;i<graph.length;i++){
+                if(!vis[i]){
+                    if(detectCycleUtil(graph,vis,i,-1)){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        public static boolean detectCycleUtil(ArrayList<Edge>graph[],boolean vis[],int curr,int par){
+            vis[curr]=true;
+            for(int i=0;i<graph[curr].size();i++){
+                Edge e=graph[curr].get(i);
+                if(!vis[e.dest]){   //case--1
+                    if(detectCycleUtil(graph,vis,e.dest,curr)){
+                        return true;
+                    }
+                }
+                else if(vis[e.dest] && e.dest!=par){    //case--2
+                    return true;
+                }
+                //case--3 ->do anything
+            }
+            return false;
+        }
+    public static void main(String[] args) {
+        ArrayList<Edge>[] graph=new ArrayList[5];
+        for(int i=0;i<graph.length;i++){
+            graph[i]=new ArrayList<>();
+        }
+        graph[0].add(new Edge(0,1));
+        graph[0].add(new Edge(0,2));
+        graph[1].add(new Edge(1,2));
+        graph[1].add(new Edge(1,0));
+        graph[2].add(new Edge(2,1));
+        graph[2].add(new Edge(2,0));
+        graph[2].add(new Edge(2,3));
+        graph[3].add(new Edge(3,2));
+        graph[4].add(new Edge(4,0));
+        System.out.print(Cycledetection(graph));
+    }
+}
+
+//gfg cycle detection in undirected graph
+
+class Solution {
+    public boolean isCycle(int V, int[][] edges) {
+        ArrayList<ArrayList<Integer>>adj=new ArrayList<>();
+        for(int i=0;i<V;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int []edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        boolean vis[]=new boolean[V];
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                if(dfsUtil(adj,i,-1,vis)){
+                    return true;
+                }
+                
+            }
+        }
+        return false;
+    }
+    public static boolean dfsUtil(ArrayList<ArrayList<Integer>>adj,int curr,int par,boolean vis[]){
+        vis[curr]=true;
+        for(int i=0;i<adj.get(curr).size();i++){
+            int a=adj.get(curr).get(i);
+            if(!vis[a]){
+                if(dfsUtil(adj,a,curr,vis)){
+                    return true;
+                }
+            }
+            else if(vis[a] && a!=par){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+//Connected Component in an Undirected Graph
+//gfg
+
+
+class Solution {
+    public ArrayList<ArrayList<Integer>> getComponents(int V, int[][] edges) {
+        boolean vis[]=new boolean[V];
+        ArrayList<ArrayList<Integer>>adj=new ArrayList<>();
+        for(int i=0;i<V;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int[] edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        ArrayList<ArrayList<Integer>>ans=new ArrayList<>();
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                ArrayList<Integer>an=new ArrayList<>();
+                dfsUtil(adj,i,vis,an);
+                ans.add(an);
+            }
+        }
+        return ans;
+    }
+    public static void dfsUtil(ArrayList<ArrayList<Integer>>adj,int curr,boolean vis[],ArrayList<Integer>an){
+        vis[curr]=true;
+        an.add(curr);
+        for(int i=0;i<adj.get(curr).size();i++){
+            int a= adj.get(curr).get(i);
+            if(!vis[a]){
+                dfsUtil(adj,a,vis,an);
+            }
+        }
+    }
+}
+
+
+//Count the Number of Complete Componenets
+//leetcode
+
+class Solution {
+    public int countCompleteComponents(int n, int[][] edges) {
+        boolean vis[]=new boolean[n];
+        ArrayList<ArrayList<Integer>>adj=new ArrayList<>();
+        for(int i=0;i<n;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int[] edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        int count=0;
+        for(int i=0;i<n;i++){
+            ArrayList<Integer> ans=new ArrayList<>();
+            if(!vis[i]){
+                dfsUtil(adj,vis,i,ans);
+                int nodecount=ans.size();
+                int edgescount=0;
+
+                for(int node:ans){
+                    edgescount+=adj.get(node).size();
+                }
+                edgescount=edgescount/2;
+                if(edgescount==nodecount*(nodecount-1)/2){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    public static void dfsUtil(ArrayList<ArrayList<Integer>>adj,boolean vis[],int curr,ArrayList<Integer> ans){
+        vis[curr]=true;
+        ans.add(curr);
+        for(int i=0;i<adj.get(curr).size();i++){
+            int a=adj.get(curr).get(i);
+            if(!vis[a]){
+                dfsUtil(adj,vis,a,ans);
+            }
+        }
+    }
+}
+
+//Bipartite code using cycle detection wala code
+
+import java.util.*;
+class Main {
+    static class Edge{
+        int sou;
+        int dest;
+        
+        Edge(int s,int d){
+            this.sou=s;
+            this.dest=d;
+        }
+    }
+        
+    public static boolean isBipartite(ArrayList<Edge>[] graph) {
+        int n = graph.length;
+        boolean[] vis = new boolean[n];
+        int[] level = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                level[i] = 0;
+                if (!detectCycleUtil(graph, vis, level, i, -1)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+        
+    public static boolean detectCycleUtil(ArrayList<Edge>[] graph, boolean[] vis, int[] level, int curr, int parent) {
+    vis[curr] = true;
+
+    for (Edge e : graph[curr]) {
+        int neigh = e.dest;
+
+        if (!vis[neigh]) {
+            level[neigh] = level[curr] + 1;
+
+            if (!detectCycleUtil(graph, vis, level, neigh, curr)) {
+                return false;
+            }
+        } else if (neigh != parent) {
+            // Cycle found
+            int cycleLength = level[curr] - level[neigh] + 1;
+
+            if (cycleLength % 2 == 1) {
+                // Odd cycle length detected → Not bipartite
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+    public static void main(String[] args) {
+        ArrayList<Edge>[] graph=new ArrayList[5];
+        for(int i=0;i<graph.length;i++){
+            graph[i]=new ArrayList<>();
+        }
+        graph[0].add(new Edge(0,1));
+        graph[0].add(new Edge(0,2));
+        graph[0].add(new Edge(0,4));
+        graph[1].add(new Edge(1,2));
+        graph[1].add(new Edge(1,0));
+        graph[2].add(new Edge(2,1));
+        graph[2].add(new Edge(2,0));
+        graph[2].add(new Edge(2,3));
+        graph[3].add(new Edge(3,2));
+        graph[4].add(new Edge(4,0));
+        System.out.print(isBipartite(graph));
+    }
+}
+
+//Bipartite normal code using bfs 
+
+//input system was array not arrayList
+
+class Solution {
+    public boolean isBipartite(int[][] graph) {
+        int col[]=new int[graph.length];
+        for(int i=0;i<graph.length;i++){
+            col[i]=-1;
+        }
+
+        Queue<Integer> q=new LinkedList<>();
+        for(int i=0;i<graph.length;i++){
+            if(col[i]==-1){
+                col[i]=0;
+                q.add(i);
+                while(!q.isEmpty()){
+                    int curr=q.remove();
+                    for(int j=0;j<graph[curr].length;j++){
+                        int e=graph[curr][j];
+                        if(col[e]==-1){
+                            int nextcol=col[curr]==0?1:0;
+                            col[e]=nextcol;
+                            q.add(e);
+                        }
+                        else if(col[e]==col[curr]){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+}
+
+//cycle detection in directed graph
+
+import java.util.*;
+class Main {
+    static class Edge{
+        int sou;
+        int des;
+        Edge(int s,int d){
+            this.sou=s;
+            this.des=d;
+        }
+    }
+    public static boolean isCycle(ArrayList<Edge>[] graph){
+        boolean vis[]=new boolean[graph.length];
+        boolean stack[]=new boolean[graph.length];
+        
+        for(int i=0;i<graph.length;i++){
+            if(!vis[i]){
+                if(isCycleUtil(graph,vis,stack,i)){
+                return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isCycleUtil(ArrayList<Edge>[] graph,boolean vis[],boolean stack[],int curr){
+        vis[curr]=true;
+        stack[curr]=true;
+        for(int i=0;i<graph[curr].size();i++){
+            Edge e=graph[curr].get(i);
+            if(!vis[e.des] && isCycleUtil(graph,vis,stack,e.des)){
+                    return true;
+                }
+            if(stack[e.des]){
+                return true;
+            }
+        }
+        stack[curr]=false;
+        return false;
+    }
+    
+    
+    public static void main(String[] args) {
+        ArrayList<Edge>[] graph=new ArrayList[4];
+        for(int i=0;i<graph.length;i++){
+            graph[i]=new ArrayList<>();
+        }
+        graph[0].add(new Edge(0,1));
+        graph[1].add(new Edge(1,2));
+        graph[2].add(new Edge(2,0));
+        graph[3].add(new Edge(3,0));
+        
+        System.out.print(isCycle(graph));
+    }
+}
+
+//cycle detection in directed graph gfg
+
+class Solution {
+    public boolean isCyclic(int V, int[][] edges) {
+        ArrayList<ArrayList<Integer>> adj=new ArrayList<>();
+        for(int i=0;i<V;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int []edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            adj.get(u).add(v);
+        }
+        boolean vis[]=new boolean[V];
+        boolean stack[]=new boolean[V];
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                if(dfsUtil(adj,stack,vis,i)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public static boolean dfsUtil(ArrayList<ArrayList<Integer>>adj,boolean stack[],boolean vis[],int curr){
+        vis[curr]=true;
+        stack[curr]=true;
+        for(int i=0;i<adj.get(curr).size();i++){
+            int a=adj.get(curr).get(i);
+            if(!vis[a] && dfsUtil(adj,stack,vis,a)){
+                return true;
+            }
+            if(stack[a]){
+                return true;
+            }
+        }
+        stack[curr]=false;
+        return false;
+    }
+}
+
+// **** (khud se nhi hua tha)
+
+//Redundant cycle 
+//(self-modified)
+class Solution {
+    static class Edge{
+        int sou;
+        int des;
+
+        Edge(int s,int d){
+            this.sou=s;
+            this.des=d;
+        }
+    }
+    public int[] findRedundantConnection(int[][] edges) {
+        ArrayList<Integer> [] graph=new ArrayList[edges.length+1];
+        for(int i=0;i<=edges.length;i++){
+            graph[i]=new ArrayList<>();
+        }
+        for(int[]edge : edges){
+            int u=edge[0];
+            int v=edge[1];
+
+            boolean vis[]=new boolean[edges.length+1];
+            if(hasCycle(graph,u,v,vis)){
+                return edge;
+            }
+            graph[u].add(v);
+            graph[v].add(u);
+
+        }
+        return new int[0];
+    }
+    public static boolean hasCycle(ArrayList<Integer>[]graph,int src,int target,boolean vis[]){
+        if(src==target){
+            return true;
+        }
+        for (int i=0;i<graph[src].size();i++) {
+            int a=graph[src].get(i);
+            vis[src]=true;
+            if (!vis[a]) {
+                if (hasCycle(graph, a, target, vis)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+}
+
+
+//Reduntant Cycle -2 (directed cycle)
+//********(Hard)
+
+class Solution {
+    public static int [] findRedundantDirectedConnection(int [][]edges){
+        int parent[]=new int[edges.length+1];
+        int []can1=null;
+        int []can2=null;
+        
+        for(int []edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            
+            if(parent[v]==0){
+                parent[v]=u;
+            }
+            else{
+                can1=new int[]{parent[v],v};
+                can2=new int[]{u,v};
+                edge[1]=0;
+            }
+        }
+        
+        ArrayList<Integer>[] graph=new ArrayList[edges.length+1];
+        for(int i=0;i<edges.length+1;i++){
+            graph[i]=new ArrayList<>();
+        }
+        for(int []edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            if(v==0){
+                continue;
+            }
+            graph[u].add(v);
+        }
+        boolean vis[]=new boolean[edges.length+1];
+        boolean stack[]=new boolean[edges.length+1];
+        for(int i=0;i<=edges.length;i++){
+            if(!vis[i] && hasCycle(graph,vis,stack,i)){
+                if(can1!=null){
+                    return can1;
+                }
+                else{
+                    return findReduntant(edges);
+                }
+            }
+        }
+        return can2;
+    }
+    public static boolean hasCycle(ArrayList<Integer>[] graph,boolean vis[],boolean stack[],int curr){
+        vis[curr]=true;
+        stack[curr]=true;
+        
+        for(int i=0;i<graph[curr].size();i++){
+            int a=graph[curr].get(i);
+            if(!vis[a] && hasCycle(graph,vis,stack,a)){
+                return true;
+            }
+            if(stack[a]==true){
+                return true;
+            }
+        }
+        stack[curr]=false;
+        return false;
+    }
+    public static int[] findReduntant(int[][] edges) {
+        int n = edges.length;
+        ArrayList<Integer>[] graph = new ArrayList[n + 1];
+        for (int i = 0; i <= n; i++) graph[i] = new ArrayList<>();
+
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1];
+            boolean[] visited = new boolean[n + 1];
+            if (hasPath(graph, v, u, visited)) {
+                return edge;
+            }
+            graph[u].add(v);
+        }
+
+        return new int[0];
+    }
+    public static boolean hasPath(ArrayList<Integer>[] graph, int src, int dest, boolean[] visited) {
+        if (src == dest) return true;
+        visited[src] = true;
+        for (int nei : graph[src]) {
+            if (!visited[nei]) {
+                if (hasPath(graph, nei, dest, visited)) return true;
+            }
+        }
+        return false;
+    }
+}
+
+//topological sort(DFS))
+//O(V+E)
+import java.util.*;
+class Solution {
+    public static ArrayList<Integer> topoSort(int V, int[][] edges) {
+        ArrayList<Integer> ans=new ArrayList<>();
+        ArrayList<Integer>[] graph=new ArrayList[V];
+        Stack<Integer> s=new Stack<>();
+        boolean vis[]=new boolean[V];
+        for(int i=0;i<V;i++){
+            graph[i]=new ArrayList<>();
+        }
+        for(int []edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            graph[u].add(v);
+        }
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                topos(graph,vis,i,s);
+            }
+        }
+        while(!s.isEmpty()){
+            ans.add(s.pop());
+        }
+        return ans;
+        
+    }
+    public static void topos(ArrayList<Integer>[] graph,boolean []vis,int curr,Stack<Integer> s){
+        vis[curr]=true;
+        for(int i=0;i<graph[curr].size();i++){
+            int a=graph[curr].get(i);
+            if(!vis[a]){
+                topos(graph,vis,a,s);
+            }
+        }
+        s.push(curr);    
+    }
+}
+//topological sort(BFS)
+//O(V+E)
+
+import java.util.*;
+class Solution {
+    public static ArrayList<Integer> topoSort(int V, int[][] edges) {
+        ArrayList<Integer>[] graph=new ArrayList[V];
+        ArrayList<Integer> topo=new ArrayList<>();
+        int []indegree=new int[V];
+        Queue<Integer> q=new LinkedList<>();
+        for(int i=0;i<V;i++){
+            graph[i]=new ArrayList<>();
+        }
+        for(int []edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            graph[u].add(v);
+        }
+        
+        for(int i=0;i<V;i++){
+            for(int j=0;j<graph[i].size();j++){
+                int a=graph[i].get(j);
+                indegree[a]++;
+            }
+        }
+        for(int i=0;i<V;i++){
+            if(indegree[i]==0){
+                q.add(i);
+            }
+        }
+        while(!q.isEmpty()){
+            int curr=q.remove();
+            topo.add(curr);
+            for(int i=0;i<graph[curr].size();i++){
+                int a=graph[curr].get(i);
+                indegree[a]--;
+                if(indegree[a]==0){
+                    q.add(a);
+                }
+            }
+        }
+        return topo;
+    }
+}
+
+
+
+//course schedule 2
+
+class Solution {
+    public static int[] findOrder(int numCourses, int[][] prerequisites) {
+        int n = numCourses;
+        int[] indegree = new int[n];
+        ArrayList<Integer>[] graph = new ArrayList[n];
+        int[] topo = new int[n];
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        for (int[] edge : prerequisites) {
+            int u = edge[0], v = edge[1];
+            graph[v].add(u); // v → u
+            indegree[u]++;
+        }
+        for (int i = 0; i < n; i++) {
+            if (indegree[i] == 0) {
+                q.add(i);
+            }
+        }
+
+        int i = 0;
+        while (!q.isEmpty()) {
+            int curr = q.remove();
+            topo[i++] = curr;
+            for (int nei : graph[curr]) {
+               indegree[nei]--;
+                if (indegree[nei] == 0) {
+                    q.add(nei);
+                }
+            }
+        }
+
+        if (i != n) return new int[0]; 
+        return topo;
+    }
+}
+
+//dijkstra 
+//gfg que
+import java.util.*;
+class Solution {
+    static class Pair implements Comparable<Pair>{
+        int n;
+        int path;
+        
+        public Pair(int n,int path){
+            this.n=n;
+            this.path=path;
+        }
+        @Override
+        public int compareTo(Pair p2){
+            return this.path - p2.path;
+        }
+    }
+    public int[] dijkstra(int V, int[][] edges, int src) {
+        ArrayList<int[]>[] graph=new ArrayList[V];
+        int dis[]=new int[V];
+        boolean vis[]=new boolean[V];
+        for(int i=0;i<V;i++){
+            graph[i]=new ArrayList<>();
+        }
+        for(int []edge:edges){
+            int u=edge[1];
+            int v=edge[0];
+            int wt=edge[2];
+            graph[u].add(new int[]{v,wt});
+        }
+        for(int i=0;i<V;i++){
+            if(i!=src){
+                dis[i]=Integer.MAX_VALUE;
+            }
+            dis[src]=0;
+        }
+        PriorityQueue<Pair>pq=new PriorityQueue();
+        pq.add(new Pair(src,0));
+        
+        while(!pq.isEmpty()){
+            Pair curr=pq.remove();
+            if(!vis[curr.n]){
+                vis[curr.n]=true;
+                int u = curr.n;
+                for (int[] neighbor : graph[u]) {
+                    int v = neighbor[0];
+                    int wt = neighbor[1];
+                    if (dis[u] + wt < dis[v]) {
+                        dis[v] = dis[u] + wt;
+                        pq.add(new Pair(v, dis[v]));
+                    }
+                }
+            }
+        }
+        return dis;
+    }
+}
+
+//Max Area of Island
+
+class Solution {
+    static class Pair{
+        int row;
+        int col;
+        Pair(int row,int col){
+            this.row=row;
+            this.col=col;
+        }
+    }
+    public int maxAreaOfIsland(int[][] grid) {
+        int rows=grid.length;
+        int cols=grid[0].length;
+        boolean vis[][]=new boolean[rows][cols];
+        int MaxRegion=0;
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                if(grid[i][j]==1 && !vis[i][j]){
+                    int size=Area(grid,vis,i,j);
+                    MaxRegion=Math.max(size,MaxRegion);
+                }
+            }
+        }
+        return MaxRegion;
+    }
+    public int Area(int [][]grid,boolean vis[][],int startrow,int startcol){
+        int rows=grid.length;
+        int cols=grid[0].length;
+        Queue<Pair> q=new LinkedList<>();
+        q.add(new Pair(startrow,startcol));
+        int []dx={-1,0,0,1};
+        int []dy={0,1,-1,0};
+        vis[startrow][startcol]=true;
+        int count=1;
+        while(!q.isEmpty()){
+            Pair curr=q.remove();
+            for(int i=0;i<4;i++){
+                int ni=curr.row + dx[i];
+                int nj=curr.col + dy[i];
+
+                if(ni>=0 && ni<rows && nj>=0 && nj<cols && grid[ni][nj]==1 && !vis[ni][nj]){
+                    q.add(new Pair(ni,nj));
+                    vis[ni][nj]=true;
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+}
+
+//Rooten Oranges
+
+class Solution {
+    static class Pair{
+        int row;
+        int col;
+        int time;
+        Pair(int row,int col,int time){
+            this.row=row;
+            this.col=col;
+            this.time=time;
+        }
+    }
+    public int orangesRotting(int[][] grid) {
+        int []dx={-1,1,0,0};
+        int []dy={0,0,1,-1};
+        int rows=grid.length;
+        int cols=grid[0].length;
+        Queue<Pair> q=new LinkedList<>();
+        int fresh=0;
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                if(grid[i][j]==2){
+                    q.add(new Pair(i,j,0));
+                }
+                else if(grid[i][j]==1){
+                    fresh++;
+                }
+            }
+        }
+        int time=0;
+        while(!q.isEmpty()){
+            Pair curr=q.remove();
+            time=curr.time;
+            for(int i=0;i<4;i++){
+                int ni=curr.row + dx[i];
+                int nj=curr.col + dy[i]; 
+
+                if(ni>=0 && ni<rows && nj>=0 && nj<cols && grid[ni][nj]==1){
+                    grid[ni][nj]=2;
+                    fresh--;
+                    q.add(new Pair(ni,nj,curr.time+1));
+                }
+            }
+        }
+        return (fresh==0)?time:-1;
+    }
+}
+
+//word ladder
+
+class Solution {
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        Set<String> wordset=new HashSet<>(wordList);
+        if(!wordset.contains(endWord)){
+            return 0;
+        }
+        Queue<String> q=new LinkedList<>();
+        q.add(beginWord);
+        int level=1;
+        while(!q.isEmpty()){
+            int size=q.size();
+            while(size-- >0){
+                String word=q.remove();
+                if(word.equals(endWord)){
+                    return level;
+                }
+                for(int i=0;i<word.length();i++){
+                    char []ch=word.toCharArray();
+                    for(char c='a';c<='z';c++){
+                        ch[i]=c;
+                        String next=new String(ch);
+                        if(wordset.contains(next)){
+                            q.add(next);
+                            wordset.remove(next);
+                        }
+                    }
+                }
+            }
+            level++;
+        }
+        return 0;
+    }
+}
+
+//cheapest flight with atmost k stops
+//*************(good)
+
+class Solution {
+    static class Edge{
+        int src;
+        int dst;
+        int wt;
+        Edge(int src,int dst,int wt){
+            this.src=src;
+            this.dst=dst;
+            this.wt=wt;
+        }
+    }
+    static class Info{
+        int v;
+        int cost;
+        int stops;
+        Info(int v,int c,int s){
+            this.v=v;
+            this.cost=c;
+            this.stops=s;
+        }
+    }
+    public static void CreateGraph(int [][]flights,ArrayList<Edge> graph[]){
+        for(int i=0;i<graph.length;i++){
+            graph[i]=new ArrayList<>();
+        }
+        for(int i=0;i<flights.length;i++){
+            int src=flights[i][0];
+            int dst=flights[i][1];
+            int wt=flights[i][2];
+            Edge e=new Edge(src,dst,wt);
+            graph[src].add(e);
+        }
+    }
+    public static int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        ArrayList<Edge>[] graph=new ArrayList[n];
+        CreateGraph(flights,graph);
+        int dist[]=new int[n];
+        for(int i=0;i<n;i++){
+            if(i!=src){
+                dist[i]=Integer.MAX_VALUE;
+            }
+        }
+        Queue<Info> q=new LinkedList<>();
+        q.add(new Info(src,0,0));
+        while(!q.isEmpty()){
+            Info curr=q.remove();
+            if(curr.stops>k){
+                break;
+            }
+            for(int i=0;i<graph[curr.v].size();i++){
+                Edge e=graph[curr.v].get(i);
+                int u=e.src;
+                int v=e.dst;
+                int wt=e.wt;
+
+
+                if(curr.cost + wt<dist[v] && curr.stops<=k){
+                    dist[v]=curr.cost+wt;
+                    q.add(new Info(v,dist[v],curr.stops+1));
+                }
+            }
+        }
+        if(dist[dst]==Integer.MAX_VALUE){
+            return -1;
+        }
+        else{
+            return dist[dst];
+        }
+    }
+}
+
+//acha question hai 
+// min cost to connect all the points
+//used-->priorityqueue-->O(nlogn)
+
+class Solution {
+    static class Info implements Comparable<Info>{
+        int cost;
+        int node;
+        Info(int cost,int node){
+            this.cost=cost;
+            this.node=node;
+        }
+        @Override
+        public int compareTo(Info i2){
+            return this.cost-i2.cost;
+        }
+    }
+    public int minCostConnectPoints(int[][] points) {
+        boolean[] vis=new boolean[points.length];
+        PriorityQueue<Info> pq=new PriorityQueue<>();;
+        pq.add(new Info(0,0));
+        int totalcost=0;
+        int nodeConnection=0;
+        while(nodeConnection<points.length){
+            Info curr=pq.remove();
+            int c=curr.cost;
+            int u=curr.node;
+
+            if(vis[u]==true){
+                continue;
+            }
+            vis[u]=true;
+            totalcost+=c;
+            nodeConnection++;
+
+            for(int i=0;i<points.length;i++){
+                if(!vis[i]){
+                    int dist=Math.abs(points[u][0]-points[i][0])+Math.abs(points[u][1]-points[i][1]);
+                    pq.add(new Info(dist,i));
+                }
+            }
+        }
+        return totalcost;
+    }
+}
+
+
+
+
+//kosaraju algorithm
+
+class Solution {
+    public static void topsort(ArrayList<ArrayList<Integer>> adj,int curr,boolean vis[],Stack<Integer>s){
+        vis[curr]=true;
+        
+        for(int i=0;i<adj.get(curr).size();i++){
+            int a=adj.get(curr).get(i);
+            if(!vis[a]){
+                topsort(adj,a,vis,s);
+            }
+        }
+        s.push(curr);
+    }
+    public static void dfs(ArrayList<ArrayList<Integer>> Transpose,int curr,boolean vis[]){
+        int count=0;
+        vis[curr]=true;
+        count++;
+        for(int i=0;i<Transpose.get(curr).size();i++){
+            int t=Transpose.get(curr).get(i);
+            if(!vis[t]){
+                dfs(Transpose,t,vis);
+            }
+        }
+    }
+    public int kosaraju(ArrayList<ArrayList<Integer>> adj) {
+        Stack<Integer> s=new Stack<>();
+        int r=adj.size();
+        boolean vis[]=new boolean[adj.size()];
+        for(int i=0;i<r;i++){ // step-1( get node in stack using topological sort)
+            if(!vis[i]){
+                topsort(adj,i,vis,s);
+            }
+        }
+        ArrayList<ArrayList<Integer>> Transpose=new ArrayList<>(); //step-2
+        for(int i=0;i<r;i++){
+            vis[i]=false;
+            Transpose.add(new ArrayList<>());
+        }
+        for(int i=0;i<r;i++){
+            for(int j=0;j<adj.get(i).size();j++){
+                int dest=adj.get(i).get(j);
+                Transpose.get(dest).add(i);
+            }
+        }
+        int c=0;
+        while(!s.isEmpty()){ //step-3
+            int curr=s.pop();
+            if(!vis[curr]){
+               dfs(Transpose,curr,vis);
+               c++;
+            }
+        }
+        return c;
+    }
+    
+}
+
+//Critical Connection(Bridge in graph)
+//O(V+E)
+//leetcode
+//Tarjan's
+
+class Solution {
+    public static List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {
+        List<List<Integer>> ans=new ArrayList<>();
+        List<List<Integer>> adj=new ArrayList<>();
+        for(int i=0;i<n;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int i=0;i<connections.size();i++){
+            int u=connections.get(i).get(0);
+            int v=connections.get(i).get(1);
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        int []dt=new int[n];
+        int []low=new int[n];
+        int time=0;
+        boolean vis[]=new boolean[n];
+        for(int i=0;i<n;i++){
+            if(!vis[i]){
+                dfs(adj,-1,vis,dt,low,i,time,ans);
+            }
+        }
+        return ans;
+    }
+    public static void dfs(List<List<Integer>> adj,int par,boolean vis[],int []dt,int []low,int curr,int time,List<List<Integer>> ans){
+        vis[curr]=true;
+        dt[curr]=low[curr]=++time;
+        for(int i=0;i<adj.get(curr).size();i++){
+            int neigh=adj.get(curr).get(i);
+            if(neigh==par){
+                continue;
+            }
+            else if(!vis[neigh]){
+                dfs(adj,curr,vis,dt,low,neigh,time,ans);
+                low[curr]=Math.min(low[curr],low[neigh]);
+                if(dt[curr]<low[neigh]){
+                    ans.add(Arrays.asList(curr,neigh));
+                }
+            }
+            else{
+                if(vis[neigh]){
+                    low[curr]=Math.min(low[curr],dt[neigh]);
+                }
+            }
+        }
+    }
+}
+
+//Articulation point
+//O(V+E)
+//gfg
+class Solution {
+    public ArrayList<Integer> articulationPoints(int V,
+                                                 ArrayList<ArrayList<Integer>> adj) {
+        ArrayList<Integer> ans=new ArrayList<>();
+        boolean vis[]=new boolean[V];
+        boolean ap[]=new boolean[V];
+        int []dt=new int[V];
+        int []low=new int[V];
+        int time=0;
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                dfs(adj,i,-1,dt,low,time,vis,ap);
+            }
+        }
+        for(int i=0;i<V;i++){
+            if(ap[i]){
+                ans.add(i);
+            }
+        }
+        if(ans.size()==0){
+            ans.add(-1);
+        }
+        return ans;
+    }
+    public static void dfs(ArrayList<ArrayList<Integer>> adj,int curr,int par,int []dt,int []low,int time,boolean []vis,boolean []ap){
+        vis[curr]=true;
+        dt[curr]=low[curr]=++time;
+        int children=0;
+        for(int i=0;i<adj.get(curr).size();i++){
+            int neigh=adj.get(curr).get(i);
+            if(par==neigh){
+                continue;
+            }
+            else if(vis[neigh]){
+                low[curr]=Math.min(low[curr],dt[neigh]);
+            }
+            else{
+                dfs(adj,neigh,curr,dt,low,time,vis,ap);
+                low[curr]=Math.min(low[curr],low[neigh]);
+                if(par!=-1 && dt[curr]<=low[neigh]){
+                    ap[curr]=true;
+                }
+                children++;
+            }
+        }
+        if(par==-1 && children>1){
+            ap[curr]=true;
+        }
+    }
+}
+
+
+//Articulation point-II
+//gfg
+
+import java.util.*;
+class Solution {
+    public static void dfs(ArrayList<ArrayList<Integer>> adj,int curr,int par,int time,int []dt,int []low,boolean vis[],boolean ap[]){
+        vis[curr]=true;
+        dt[curr]=low[curr]=++time;
+        int children=0;
+        
+        for(int i=0;i<adj.get(curr).size();i++){
+            int neigh=adj.get(curr).get(i);
+            if(neigh==par){
+                continue;
+            }
+            else if(vis[neigh]){
+                low[curr]=Math.min(low[curr],dt[neigh]);
+            }
+            else{
+                dfs(adj,neigh,curr,time,dt,low,vis,ap);
+                low[curr]=Math.min(low[curr],low[neigh]);
+                if(par!=-1 && dt[curr]<=low[neigh]){
+                    ap[curr]=true;
+                }
+                children++;
+            }
+        }
+        if(par==-1 && children>1){
+            ap[curr]=true;
+        }
+        
+    }
+    public static ArrayList<Integer> articulationPoints(int V, int[][] edges) {
+        ArrayList<Integer> ans=new ArrayList<>();
+        boolean vis[]=new boolean[V];
+        boolean ap[]=new boolean[V];
+        int []dt=new int[V];
+        int []low=new int[V];
+        int time=0;
+        ArrayList<ArrayList<Integer>> adj=new ArrayList<>();
+        for(int i=0;i<V;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int []edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                dfs(adj,i,-1,time,dt,low,vis,ap);
+            }
+        }
+        for(int i=0;i<V;i++){
+            if(ap[i]){
+                ans.add(i);
+            }
+        }
+        if(ans.size()==0){
+            ans.add(-1);
+        }
+        return ans;
+    }
+}
+
+
+//-------PRACTICE-------------
+//Mother vertex
+//gfg
+
+class Solution {
+    public static void dfsUtil(ArrayList<ArrayList<Integer>> adj,int curr,boolean vis[]){
+        vis[curr]=true;
+        for(int i=0;i<adj.get(curr).size();i++){
+            int a=adj.get(curr).get(i);
+            if(!vis[a]){
+                dfsUtil(adj,a,vis);
+            }
+        }
+    }
+    public int findMotherVertex(int V, ArrayList<ArrayList<Integer>> adj) {
+        boolean vis[]=new boolean[V];
+        boolean check[]=new boolean[V];
+        int ans=-1;
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                dfsUtil(adj,i,vis);
+                ans=i;
+            }
+        }
+        
+        dfsUtil(adj,ans,check);
+        
+        for(int i=0;i<V;i++){
+            if(!check[i]){
+                return -1;
+            }
+        }
+        return ans;
+    }
+}
+ //acha que (simple small sa logic)
+ //indegree wala 
+//Minimum number of vertices to reach all the nodes
+ class Solution {
+    public List<Integer> findSmallestSetOfVertices(int n, List<List<Integer>> edges) {
+        int []indegree=new int[n];
+        for(List<Integer>edge:edges){
+            int u=edge.get(1);
+            indegree[u]++;
+        }
+        List<Integer> ans=new ArrayList<>();
+        for(int i=0;i<n;i++){
+            if(indegree[i]==0){
+                ans.add(i);
+            }
+        }
+        return ans;
+    }
+}
+
+
+//Minimum edge we have to reverse to make a path from src to dest
+//acha que
+
+class Solution {
+    static class Pair{
+        int node;
+        int cost;
+        Pair(int node,int cost){
+            this.node=node;
+            this.cost=cost;
+        }
+    }
+    public static int minimumEdgeReversal(int[][] edges, int n, int m, int src,
+                                          int dst) {
+        ArrayList<ArrayList<Pair>>adj=new ArrayList<>();
+        int []dist=new int[n+1];
+        for(int i=0;i<=n;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int[]edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            adj.get(u).add(new Pair(v,0));
+            adj.get(v).add(new Pair(u,1));
+        }
+        Deque<Integer> q=new LinkedList<>();
+        for(int i=0;i<=n;i++){
+            if(i!=src){
+                dist[i]=Integer.MAX_VALUE;
+            }
+        }
+        
+        q.addFirst(src);
+        while(!q.isEmpty()){
+            int curr=q.remove();
+            for(Pair neigh:adj.get(curr)){
+                if(dist[neigh.node]>dist[curr]+neigh.cost){
+                    dist[neigh.node]=dist[curr]+neigh.cost;
+                    
+                    if(neigh.cost==0){
+                        q.addFirst(neigh.node);
+                    }
+                    else{
+                        q.addLast(neigh.node);
+                    }
+                }
+            }
+        }
+        return dist[dst]==Integer.MAX_VALUE ? -1 : dist[dst];
+    }
+}
+
+//Alien dictionary 
+//imp que (graphs ka)
+
+class Solution {
+    public String findOrder(String[] words) {
+        int k=26;
+        ArrayList<ArrayList<Integer>> adj=new ArrayList<>();
+        for(int i=0;i<k;i++){
+            adj.add(new ArrayList<>());
+        }
+        Set<Integer> check = new HashSet<>();
+        for(String word : words){
+            for(char c : word.toCharArray()){
+                check.add(c-'a');
+            }
+        }
+        
+        for(int i=0;i<words.length-1;i++){
+            String word1=words[i];
+            String word2=words[i+1];
+            boolean found = false;
+            int len=Math.min(word1.length(),word2.length());
+            for(int j=0;j<len;j++){
+                char c1 = word1.charAt(j);
+                char c2 = word2.charAt(j);
+                if(c1!=c2){
+                    adj.get(c1-'a').add(c2-'a');
+                    found=true;
+                    break;
+                }
+                
+            }
+            if (!found && word1.length() > word2.length()) {
+                return "";
+            }
+        }
+        int []indegree=new int[k];
+        for(int i=0;i<k;i++){
+            for(int it:adj.get(i)){
+                indegree[it]++;
+            }
+        }
+        Queue<Integer> q=new LinkedList<>();
+        for(int i=0;i<k;i++){
+            if(indegree[i]==0 && check.contains(i)){
+                q.add(i);
+            }
+        }
+        int count=0;
+        StringBuilder sb=new StringBuilder();
+        while(!q.isEmpty()){
+            int curr=q.remove();
+            count++;
+            sb.append((char)(curr+'a'));
+            for(int neigh:adj.get(curr)){
+                indegree[neigh]--;
+                if(indegree[neigh]==0){
+                    q.add(neigh);
+                }
+            }
+        }
+        if(count != check.size()){
+            return "";
+        }
+        return sb.toString();
+    }
+}
+
+
+//Number of closed island
+//bfs used (next time use dfs)
+//(good que)
+
+class Solution {
+    static class Pair{
+        int row;
+        int col;
+        Pair(int row,int col){
+            this.row=row;
+            this.col=col;
+        }
+    }
+    public static boolean bfs(int[][]grid,int i,int j,boolean vis[][]){
+        int []dx={-1,1,0,0};
+        int []dy={0,0,1,-1};
+        int rows=grid.length;
+        int cols=grid[0].length;
+        vis[i][j]=true;
+        boolean isClosed = true;
+        Queue<Pair> q=new LinkedList<>();
+        q.add(new Pair(i,j));
+        while(!q.isEmpty()){
+            Pair curr=q.remove();
+            if(curr.row==0 || curr.col==0 || curr.row==rows-1 || curr.col==cols-1){
+                isClosed=false;
+            }
+            for(int k=0;k<4;k++){
+                int ni=curr.row + dx[k];
+                int nj=curr.col + dy[k];
+                if(ni>=0 && nj>=0 && ni<rows && nj<cols && grid[ni][nj]==0 && !vis[ni][nj]){
+                    vis[ni][nj]=true;
+                    q.add(new Pair(ni,nj));
+                }
+            }
+        }
+        return isClosed;
+    }
+    public static int closedIsland(int[][] grid) {
+        int []dx={-1,1,0,0};
+        int []dy={0,0,1,-1};
+        int rows=grid.length;
+        int cols=grid[0].length;
+        boolean[][] vis = new boolean[rows][cols];
+        int count=0;
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                if(grid[i][j]==0 && !vis[i][j]){
+                    if(bfs(grid,i,j,vis)){
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+}
+
+
+//clone graph
+//leetcode
+//good que
+class Solution {
+    public Map<Node,Node> map=new HashMap<>();
+    public Node cloneGraph(Node node) {
+        if(node==null){
+            return null;
+        }
+        if(map.containsKey(node)){
+            return map.get(node);
+        }
+        Node clone=new Node(node.val,new ArrayList<>());
+        map.put(node,clone);
+        for(Node nei:node.neighbors){
+            clone.neighbors.add(cloneGraph(nei));
+        }
+        return clone;
+    }
+}
+
+
+//number of provinces
+//leetcode
+
+class Solution {
+    public int findCircleNum(int[][] isConnected) {
+        ArrayList<ArrayList<Integer>>adj=new ArrayList<>();
+        for(int i=0;i<isConnected.length+1;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int i=0;i<isConnected.length;i++){
+            for(int j=0;j<isConnected[0].length;j++){
+                if(isConnected[i][j]==1 && i!=j){
+                    adj.get(i+1).add(j+1);
+                }
+            }
+        }
+        int count=0;
+        boolean vis[]=new boolean[isConnected.length+1];
+        for(int i=0;i<adj.size();i++){
+            if(!vis[i]){
+                dfsUtil(adj,i,vis);
+                count++;
+            }
+        }
+        return count-1;
+    }
+    public static void dfsUtil(ArrayList<ArrayList<Integer>>adj,int curr,boolean vis[]){
+        vis[curr]=true;
+        for(int i=0;i<adj.get(curr).size();i++){
+            int a=adj.get(curr).get(i);
+            if(!vis[a]){
+                dfsUtil(adj,a,vis);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
